@@ -20,6 +20,24 @@
 package_options = ""
 
 case node.platform_family
+when 'suse'
+  # Hack 'temporarire' pour supporter SuSE
+  # vu que le cookbook officiel ne supporte pas SuSE..
+  if node[:platform_family] == 'suse'
+    cookbook_file '/var/tmp/sensu-0.9.9-1.x86_64.rpm' do
+      notifies :run, 'execute[install_rpm]'
+    end
+
+    execute 'install_rpm' do
+      action :nothing
+      command 'rpm -Uvh /var/tmp/sensu-0.9.9-1.x86_64.rpm'
+    end
+  end
+
+  template '/etc/init.d/sensu-client' do
+    source 'suse.init.erb'
+    mode 0755
+  end
 when "debian"
   package_options = '--force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
 
@@ -61,9 +79,12 @@ when "fedora"
   end
 end
 
-package "sensu" do
-  version node.sensu.version
-  options package_options
+# hack ..
+unless node[:platform_family] == 'suse'
+  package "sensu" do
+    version node.sensu.version
+    options package_options
+  end
 end
 
 template "/etc/default/sensu" do
