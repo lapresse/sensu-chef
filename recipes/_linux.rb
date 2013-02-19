@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-package_options = ""
+#package_options = ""
 
 case node.platform_family
 when 'suse'
@@ -51,13 +51,13 @@ when "debian"
     action :add
   end
 when "rhel"
-  include_recipe "yum"
+  #include_recipe "yum"
 
-  yum_repository "sensu" do
-    repo = node.sensu.use_unstable_repo ? "yum-unstable" : "yum"
-    url "http://repos.sensuapp.org/#{repo}/el/#{node['platform_version'].to_i}/$basearch/"
-    action :add
-  end
+  #yum_repository "sensu" do
+  #  repo = node.sensu.use_unstable_repo ? "yum-unstable" : "yum"
+  #  url "http://repos.sensuapp.org/#{repo}/el/#{node['platform_version'].to_i}/$basearch/"
+  #  action :add
+  #end
 when "fedora"
   include_recipe "yum"
 
@@ -83,7 +83,9 @@ end
 unless node[:platform_family] == 'suse'
   package "sensu" do
     version node.sensu.version
-    options package_options
+    if node[:platform_family] == 'rhel'
+      options '--nogpgcheck'
+    end
   end
 end
 
