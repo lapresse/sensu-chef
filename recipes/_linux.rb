@@ -25,11 +25,11 @@ when 'suse'
   # vu que le cookbook officiel ne supporte pas SuSE..
   if node[:platform_family] == 'suse'
     cookbook_file '/var/tmp/sensu-0.9.9-1.x86_64.rpm' do
-      notifies :run, 'execute[install_rpm]'
+      notifies :run, 'execute[install_rpm]', :immediately
     end
 
     execute 'install_rpm' do
-      action :nothing
+      not_if "rpm -qi sensu"
       command 'rpm -Uvh /var/tmp/sensu-0.9.9-1.x86_64.rpm'
     end
   end
