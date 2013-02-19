@@ -29,7 +29,7 @@ when 'suse'
     end
 
     execute 'install_rpm' do
-      action :nothing
+      not_if "rpm -qi sensu"
       command 'rpm -Uvh /var/tmp/sensu-0.9.9-1.x86_64.rpm'
     end
   end
